@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "ticket": "I was charged twice for my subscription this month. My invoice shows two payments of $99 on the same date. Please refund one of them immediately.",
+    "category": "billing",
+    "resolution": "Apologised for the duplicate charge, confirmed a refund was processed within 3–5 business days, and asked the customer to share the invoice number for faster processing.",
+    "keywords": ["charged", "twice", "invoice", "refund", "payment", "subscription", "billing"]
+  },
+  {
+    "id": 2,
+    "ticket": "The dashboard is completely broken since this morning. None of our reports load — they just spin forever. This is blocking our entire team from doing their work.",
+    "category": "bug report",
+    "resolution": "Escalated to the engineering team, provided the customer with a ticket reference, and gave an ETA of 2 hours for a status update.",
+    "keywords": ["broken", "not loading", "spinning", "bug", "error", "dashboard", "reports", "blocking"]
+  },
+  {
+    "id": 3,
+    "ticket": "It would be great if we could export our data as a CSV directly from the analytics page instead of having to use the API every time.",
+    "category": "feature request",
+    "resolution": "Thanked the customer for the suggestion, confirmed it was logged in the product roadmap, and shared the current workaround via the API.",
+    "keywords": ["feature", "export", "csv", "analytics", "request", "would be great", "suggestion"]
+  },
+  {
+    "id": 4,
+    "ticket": "I can't log in to my account. I reset my password three times and still get an 'Invalid credentials' error. I urgently need access.",
+    "category": "account issue",
+    "resolution": "Verified the account, manually triggered a password reset from the admin panel, and asked the customer to try again and report back.",
+    "keywords": ["can't log in", "login", "password", "reset", "credentials", "access", "account"]
+  },
+  {
+    "id": 5,
+    "ticket": "We're about to go live with a major product launch using your API and it just stopped responding. We're losing thousands of dollars every minute. Fix this NOW or we're cancelling our enterprise contract.",
+    "category": "bug report",
+    "resolution": "Immediately escalated to the CTO and on-call engineering team. Sent the customer a direct line to the incident response manager and provided a live status page link.",
+    "keywords": ["api", "down", "not responding", "launch", "enterprise", "cancel", "contract", "losing money"]
+  },
+  {
+    "id": 6,
+    "ticket": "Can you tell me how to add a new team member to our workspace? I'm the account admin but I can't find the invite option.",
+    "category": "account issue",
+    "resolution": "Provided step-by-step instructions to navigate to Settings > Team > Invite Members and included a help-centre link.",
+    "keywords": ["add", "team member", "invite", "admin", "workspace", "settings"]
+  },
+  {
+    "id": 7,
+    "ticket": "We've noticed some strange activity on our account — logins from IPs we don't recognise. We're worried our data might be compromised.",
+    "category": "account issue",
+    "resolution": "Treated as a potential security incident, escalated to the security team, locked the account temporarily, and asked the customer to verify their identity via a secure channel.",
+    "keywords": ["strange activity", "login", "ip", "security", "compromised", "data breach", "unauthorised"]
+  },
+  {
+    "id": 8,
+    "ticket": "I would love to see dark mode added to the app. Any plans for that?",
+    "category": "feature request",
+    "resolution": "Thanked the customer, confirmed dark mode is on the roadmap for Q3, and invited them to upvote it in the community forum.",
+    "keywords": ["dark mode", "feature", "plans", "roadmap", "design"]
+  },
+  {
+    "id": 9,
+    "ticket": "Our annual invoice renewal is coming up and we'd like to discuss upgrading to the enterprise plan. Who should we talk to?",
+    "category": "billing",
+    "resolution": "Introduced the customer to their dedicated account manager, provided contact details, and shared the enterprise plan comparison page.",
+    "keywords": ["invoice", "renewal", "upgrade", "enterprise", "plan", "billing", "annual"]
+  },
+  {
+    "id": 10,
+    "ticket": "asdfgh hjkl test 123",
+    "category": "other",
+    "resolution": "Replied politely asking the customer to describe their issue in more detail so the team could assist them effectively.",
+    "keywords": []
+  }
+]
