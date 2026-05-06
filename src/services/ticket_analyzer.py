@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 
 from src.models import LLMTicketAnalysis, TicketCategory, TicketResponse
-from src.services.llm_service import LLMError, call_llm
+from src.services.llm_service import call_llm
 from src.utils.prompt_templates import build_user_prompt
 
 logger = logging.getLogger(__name__)
@@ -126,6 +126,7 @@ async def analyze_ticket(ticket_text: str) -> TicketResponse:
 
     # ── Build and return the final response ───────────────────────────────────
     return TicketResponse(
+        id=None,
         category=_normalise_category(analysis.category),
         draft_reply=analysis.draft_reply,
         escalation=analysis.escalation,

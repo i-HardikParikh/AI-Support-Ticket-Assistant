@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:       #0b0c0f;
+  --surface:  #13141a;
+  --surface2: #1a1c24;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --accent:   #7c6af5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--bg);
+  color: #e8e9f0;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Syne', sans-serif;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+textarea:focus, input:focus { outline: none; }
+
+@keyframes barGrow {
+  from { width: 0%; }
+  to   { width: var(--target-width); }
+}
+.confidence-bar { animation: barGrow 0.7s ease-out forwards; }
+
+@keyframes toastIn  { from{ opacity:0; transform:translateY(8px) } to{ opacity:1; transform:translateY(0) } }
+@keyframes toastOut { from{ opacity:1 } to{ opacity:0; transform:translateY(8px) } }
+.toast-enter { animation: toastIn  .25s ease forwards; }
+.toast-leave { animation: toastOut .25s ease forwards; }
+

@@ -1,70 +1,3 @@
-# AI Support Ticket Assistant
-
-FastAPI backend + Streamlit UI for support ticket analysis.
-
-## Setup
-
-### 1) Create and activate virtual environment (PowerShell)
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-### 2) Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3) Add `.env` in project root
-
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-GROQ_API_KEY=your_groq_api_key_here
-LOG_LEVEL=INFO
-```
-
-## Run
-
-### Terminal 1 - FastAPI
-
-```bash
-uvicorn src.main:app --reload
-```
-
-### Terminal 2 - Streamlit
-
-```bash
-streamlit run src/streamlit_app.py
-```
-
-## URLs
-
-- API: `http://127.0.0.1:8000`
-- Swagger: `http://127.0.0.1:8000/docs`
-- Streamlit UI: `http://localhost:8501`
-
-## Test API
-
-### Health check
-
-```bash
-curl http://127.0.0.1:8000/health
-```
-
-### Analyze ticket (PowerShell)
-
-```powershell
-$body = @{ ticket = "I was double-charged this month." } | ConvertTo-Json
-Invoke-RestMethod -Method Post `
-  -Uri "http://127.0.0.1:8000/analyze-ticket" `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-
-
 
 ###  Part 1 (Solution design - No code)
 
@@ -104,4 +37,231 @@ Actually sending the reply. The draft is there for the agent to review — not t
 Escalation actions. The system flags escalations, it doesn't act on them. If a customer mentions legal action or a data breach, a human has to decide what happens next. The AI has no idea what that customer's contract looks like or what the business relationship actually is.
 
 Closing tickets. The agent does that manually. That action also tells us whether the AI draft was actually useful — which is data we really need.
+
+
+
+
+
+
+
+
+
+
+# AI Support Ticket Assistant
+
+A production-grade AI support assistant that automatically classifies incoming support tickets, generates draft replies, detects escalations, and tracks agent feedback — with a real-time agent dashboard and email webhook integration.
+
+**Live demo:** `your-app.vercel.app`  
+**Backend API docs:** `your-backend.railway.app/docs`
+
+---
+
+## What It Does
+
+- **Classifies** tickets into: billing, bug report, feature request, account issue, other
+- **Drafts** a professional reply the agent can approve or edit
+- **Detects escalations** with a specific reason (not just a flag)
+- **Saves every ticket** to Supabase with full audit trail
+- **Captures agent feedback** — approved, edited, escalated, dismissed
+- **Shows live stats** — accuracy rate, escalation rate, category breakdown
+- **Accepts emails** via webhook (Postmark / SendGrid inbound)
+- **Gemini primary → Groq fallback** with automatic retry logic
+
+---
+
+## Project Structure
+
+```
+support-ticket-assistant/
+├── src/                        ← FastAPI backend
+│   ├── main.py                 ← App entry point, CORS, routers
+│   ├── models.py               ← All Pydantic models
+│   ├── db/
+│   │   └── database.py         ← All Supabase DB operations
+│   ├── routers/
+│   │   └── tickets.py          ← All API endpoints
+│   ├── services/
+│   │   ├── llm_service.py      ← Gemini + Groq with retry logic
+│   │   └── ticket_analyzer.py  ← Main AI pipeline
+│   ├── utils/
+│   │   └── prompt_templates.py ← All LLM prompts
+│   └── data/
+│       └── sample_tickets.json ← RAG knowledge base
+├── frontend/                   ← Next.js agent dashboard
+│   └── src/
+│       ├── app/
+│       │   └── page.tsx        ← Main dashboard page
+│       ├── components/
+│       │   ├── TicketAnalyzer.tsx
+│       │   ├── TicketList.tsx
+│       │   ├── StatsCards.tsx
+│       │   ├── CategoryChart.tsx
+│       │   ├── CategoryBadge.tsx
+│       │   └── ConfidenceBar.tsx
+│       └── lib/
+│           └── api.ts          ← All backend API calls
+├── supabase_schema.sql         ← Run this once in Supabase SQL editor
+├── railway.toml                ← Backend deployment config
+├── requirements.txt
+└── .env
+```
+
+---
+
+## Setup — Local Development
+
+### 1. Backend
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy and fill environment variables
+cp .env .env.local
+# Edit .env with your API keys
+
+# Run backend
+uvicorn src.main:app --reload
+# → http://localhost:8000
+# → http://localhost:8000/docs  (Swagger UI)
+```
+
+### 2. Database (Supabase)
+
+1. Go to [supabase.com](https://supabase.com) → create a free project
+2. Open **SQL Editor** → paste contents of `supabase_schema.sql` → Run
+3. Go to **Project Settings → API** → copy `Project URL` and `service_role` key
+4. Add both to your `.env`
+
+### 3. Frontend
+
+```bash
+cd frontend
+npm install
+
+# Set backend URL
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+
+npm run dev
+# → http://localhost:3000
+```
+
+---
+
+## Environment Variables
+
+**Backend `.env`:**
+```
+GEMINI_API_KEY=         # Google AI Studio → aistudio.google.com
+GROQ_API_KEY=           # Groq console → console.groq.com
+SUPABASE_URL=           # https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=   # service_role key from Supabase settings
+FRONTEND_URL=           # your Vercel URL (for CORS)
+```
+
+**Frontend `frontend/.env.local`:**
+```
+NEXT_PUBLIC_API_URL=    # your Railway backend URL
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/tickets/analyze` | Analyze a ticket — main AI endpoint |
+| GET | `/tickets/` | List all tickets (filter by status) |
+| GET | `/tickets/stats` | Dashboard statistics |
+| GET | `/tickets/{id}` | Get a single ticket |
+| POST | `/tickets/feedback` | Submit agent feedback |
+| POST | `/tickets/webhook/email` | Inbound email webhook |
+| GET | `/health` | Health check |
+
+### Example curl requests
+
+```bash
+# Analyze a ticket
+curl -X POST http://localhost:8000/tickets/analyze \
+     -H "Content-Type: application/json" \
+     -d '{"ticket": "I was charged twice this month. Please refund immediately."}'
+
+# Submit feedback
+curl -X POST http://localhost:8000/tickets/feedback \
+     -H "Content-Type: application/json" \
+     -d '{"ticket_id": "abc-123", "action": "approved"}'
+
+# Get stats
+curl http://localhost:8000/tickets/stats
+
+# Health check
+curl http://localhost:8000/health
+```
+
+### Example response
+
+```json
+{
+  "id": "a3f9b2c1-...",
+  "category": "billing",
+  "draft_reply": "We apologise for the duplicate charge and have raised a refund request. You should see it credited within 3-5 business days. The Support Team",
+  "escalation": false,
+  "reason": "Standard billing dispute. No legal language, amount not specified as large.",
+  "confidence": 0.93,
+  "status": "pending"
+}
+```
+
+---
+
+## Email Webhook Setup (Postmark)
+
+1. Sign up at [postmarkapp.com](https://postmarkapp.com) — free tier available
+2. Go to **Inbound** → set webhook URL to:  
+   `https://your-backend.railway.app/tickets/webhook/email`
+3. Any email sent to your Postmark inbound address auto-creates a ticket
+
+---
+
+## Deploy to Production
+
+### Backend → Railway
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+railway login
+railway init
+railway up
+
+# Add environment variables in Railway dashboard
+```
+
+### Frontend → Vercel
+
+```bash
+cd frontend
+
+# Install Vercel CLI
+npm install -g vercel
+
+vercel
+# Follow prompts — it auto-detects Next.js
+
+# Add NEXT_PUBLIC_API_URL in Vercel dashboard → Environment Variables
+```
+
+---
+
+## Tech Stack
+
+| Layer | Tech | Why |
+|-------|------|-----|
+| Backend | FastAPI + Python | Fast, async, great for AI APIs |
+| Primary LLM | Gemini 1.5 Flash | Cheap, fast, native JSON mode |
+| Fallback LLM | Groq LLaMA 3 | Always-on backup, sub-second response |
+| Database | Supabase (PostgreSQL) | Free tier, REST API, no ORM needed |
+| Frontend | Next.js 14 + Tailwind | Fast to build, easy to deploy |
+| Deployment | Railway + Vercel | Free tiers, deploy from GitHub |
 

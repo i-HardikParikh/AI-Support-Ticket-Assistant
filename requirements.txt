@@ -5,4 +5,3 @@ pydantic-settings
 httpx
 python-dotenv
 tenacity
-streamlit

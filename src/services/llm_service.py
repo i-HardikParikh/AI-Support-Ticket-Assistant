@@ -44,7 +44,7 @@ def _extract_error_detail(response: httpx.Response) -> str:
         return text[:500] if text else "<no response body>"
 
 
-def _is_retryable_exception(exc: Exception) -> bool:
+def _is_retryable_exception(exc: BaseException) -> bool:
     """Retry only transient failures, not permanent 4xx validation/auth issues."""
     if isinstance(exc, (httpx.TimeoutException, httpx.RequestError)):
         return True
