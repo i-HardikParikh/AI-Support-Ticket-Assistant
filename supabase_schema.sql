@@ -62,4 +62,30 @@ VALUES
   ('I cannot log into my account, password reset is not working.', 'account issue', 'We have manually triggered a password reset for your account.', false, 'Standard account access issue.', 0.90, 'pending', 'api'),
   ('We are about to launch and your API is down. Fix this NOW.', 'bug report', 'We are treating this as a critical incident and escalating immediately.', true, 'Production launch blocked, high urgency language.', 0.97, 'escalated', 'email');
 
+-- 6. View for dashboard statistics (optimizes stats retrieval to run on database side)
+CREATE OR REPLACE VIEW dashboard_stats AS
+WITH category_counts AS (
+    SELECT category, COUNT(*) as cnt
+    FROM tickets
+    GROUP BY category
+),
+recent_overrides AS (
+    SELECT COUNT(*) as cnt
+    FROM tickets
+    WHERE corrected_category IS NOT NULL
+      AND created_at >= (now() - interval '7 days')
+)
+SELECT
+    COUNT(*) as total_tickets,
+    COUNT(*) FILTER (WHERE status = 'pending') as pending,
+    COUNT(*) FILTER (WHERE status = 'resolved') as resolved,
+    COUNT(*) FILTER (WHERE status = 'escalated') as escalated,
+    COUNT(*) FILTER (WHERE status = 'ai_failed') as ai_failed,
+    COALESCE(ROUND((COUNT(*) FILTER (WHERE agent_action = 'approved')::numeric / NULLIF(COUNT(*) FILTER (WHERE status IN ('resolved', 'escalated')), 0) * 100), 1), 0.0) as accuracy_rate,
+    COALESCE(ROUND((COUNT(*) FILTER (WHERE status = 'escalated')::numeric / NULLIF(COUNT(*), 0) * 100), 1), 0.0) as escalation_rate,
+    COALESCE(ROUND(AVG(confidence)::numeric, 2), 0.0) as avg_confidence,
+    (SELECT COALESCE(jsonb_object_agg(category, cnt), '{}'::jsonb) FROM category_counts) as category_breakdown,
+    (SELECT cnt FROM recent_overrides) as recent_overrides
+FROM tickets;
+
   

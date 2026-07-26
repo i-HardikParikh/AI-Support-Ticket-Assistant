@@ -201,11 +201,30 @@ async def get_ticket_by_id(ticket_id: str) -> Optional[dict]:
 async def get_dashboard_stats() -> dict:
     """
     Compute stats from the tickets table.
-    Returns a dict matching DashboardStats model.
+    Attempts to use the optimized database view 'dashboard_stats'.
+    Falls back to in-memory aggregation if the view is not yet created.
     """
     try:
+        # Try fetching from the database-optimized view
         async with httpx.AsyncClient(timeout=10.0) as client:
-            # Fetch all tickets for calculation (in production: use DB aggregates)
+            resp = await client.get(
+                f"{_get_supabase_url()}/rest/v1/dashboard_stats",
+                headers=_get_headers(),
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                if data:
+                    stats = data[0]
+                    # Ensure category breakdown is a valid dict
+                    if not isinstance(stats.get("category_breakdown"), dict):
+                        stats["category_breakdown"] = {}
+                    return stats
+    except Exception as exc:
+        logger.warning("DB view dashboard_stats not available, falling back: %s", exc)
+
+    # Fallback to in-memory calculation
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.get(
                 f"{_get_supabase_url()}/rest/v1/tickets?select=status,category,confidence,agent_action,corrected_category,created_at",
                 headers=_get_headers(),
@@ -261,7 +280,7 @@ async def get_dashboard_stats() -> dict:
         }
 
     except Exception as exc:
-        logger.error("Failed to compute stats: %s", exc)
+        logger.error("Failed to compute stats in fallback: %s", exc)
         return _empty_stats()
 
 

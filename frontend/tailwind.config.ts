@@ -9,12 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#09090b',
-        surface: '#18181b',
-        border: '#27272a',
+        bg: 'var(--bg)',
+        surface: 'var(--surface)',
+        surface2: 'var(--surface2)',
+        border: 'var(--border)',
+        border2: 'var(--border2)',
         muted: '#a1a1aa',
-        accent: '#3b82f6',
-        'accent-hover': '#2563eb',
+        accent: 'var(--accent)',
+        'accent-hover': '#6352e8',
         success: '#22c55e',
         danger: '#ef4444',
         warning: '#eab308',
